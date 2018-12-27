@@ -4,105 +4,120 @@ require "sinatra/flash"
 
 enable :sessions
 
+# if ENV['RACK_ENV'] == 'development'
+#     set :database, {adapter: "sqlite3", database: "database.sqlite3"}
+# else
+#     ActiveRecord::Base.establish_connection(ENV['DATABASE_URL'])
+# end
 
 set :database, {adapter: "sqlite3", database: "database.sqlite3"}
 
 class User < ActiveRecord::Base
-    
+  has_many :journals
 end
 
-class Journals < ActiveRecord::Base
-
-end
+class Journal < ActiveRecord::Base
+ belongs_to :user
+end 
 
 get '/' do
-     if session['user_id'] != nil
-    @journals = journal.where(user_id :session['user_id']).order(created_at: :desc)
-     end
-     p session
-erb :home
+    p session
+    erb :home
 end
 
-#New Users are signing Up
-post '/' do
-    @user = User.new(first_name: params[:first_name], last_name: params[:last_name], email: params[:email], birthday: params[:birthday])
-    @user.save
-    session['user_id'] = @user_id
-    flash[:flash] = "Account Created! Welcome to Skate Kurb!"
-    redirect '/users/skaters/#{@user.id}'
-    
-    
-   end
 
-   get '/users/skaters' do
-    "Hello World"
+  
+  post "/" do 
+    user = User.find_by(email: params['email']) 
+    if user != nil 
+      if user.password == params['password'] 
+        session[:user_id] = user.id
+        redirect "/users/skaters/#{user.id}"
+      else 
+        redirect "/users/signup"
+      end
+    end
+  end
+
+  get '/users/skaters/:id' do
+    @user = User.find(params[:id])
+    @journals = @user.journals
+    if session[:user_id]
+    erb :"/users/skaters"
+  end
+end
+
+get '/users/signup' do
+ erb :"/users/signup"
+end
+
+post '/signup' do
+   @user = User.new(first_name: params[:first_name], username: params[:username], last_name: params[:last_name], email: params[:email], birthday: params[:birthday], password: params[:password])
+   @user.save
+   session['user_id'] = @user.id
+   flash[:info] = "Account Created! Welcome to Skate Kurb!"
+    redirect "/allskaters"
+  # "/users/skaters/#{@user.id}"
+end
+
+
+
+get "/allskaters" do
+   @journal = Journal.all
+    session['user_id'] == nil
+    erb :"/allskaters"
+  end
+  
+
+post '/articles/journalentries' do 
+    @user = User.find_by(id: session[:user_id])
+    @journal = Journals.new(title: params[:title], subcategory: params[:subcategory], text: params[:text], user_id: session[:user_id])
+    @journal.save
+    flash[:info] = "Journal posted!"
+    redirect "/users/skaters/#{@user.id}"
+    
+end
+
+delete "/trashjournal/" do
+@user = User.find(id: session[:user_id])
+@journal = Journals.find(params['id'])
+if journal.user_id == session[:user_id]
+@journal.destroy
+flash[:info] = "You have deleted your post"
+redirect "/users/skaters/#{@user.id}"
+else
+  redirect "/users/skaters/#{@user.id}"
+end
+end
+
+get '/trashjournal/' do
+  erb :"/users/skaters"
+end
+
+
+post "/trashuser/:id" do
+  @user =  User.find(params["id"])
+  @user.destroy
+  session["user_id"] = nil
+  redirect "/"
+end
+
+get '/logout' do
+    session["user_id"] = nil
+    redirect "/"
   end
 
 
-#Current User are being Displayed & already Logged In
-get '/users/new' do 
-   if session['user_id'] != nil
-    flash[:flash] = 'Skater was already on Board'
-   redirect '/'
-end
-   erb :'/users/new'
-end
 
-get '/login' do
-erb :'/login'
-end
+
+  
+
+
+  
 
 
 
-#Users searching 
-post '/login' do 
-@user = User.find(email: params[:email])
-if @user != nil
-    if @user.password == params[:password]
-        session['user_id'] = @user.id
-        redirect '/'
-    else
-        redirect '/login'
-end
-end
-redirect '/login'
-end
 
-#Users writing their articles if Logged in
-get '/articles/new' do
-if session['user_id'] == nil
-flash[:flash] ='User was not logged in'
-  redirect '/'
-end
-  erb :'/articles/new'
-end
-
-get '/articles/entries' do
-" "
-   
-end
-
-
-#Users articles are up and ready for viewing
-post '/articles/entries' do 
-    flash[:flash] = "article published!"
-    @article = Article.new(title: params['title'], subcategory: params['topic'], text: params['text'], user_id: session['user_id'])
-    @article.save
-    redirect '/articles/entries/#{@article.id}'
-end
-
-delete '/articles/:id' do 
-    @article = Article.find(params['article_id'])
-    @article.destroy
-    flash[:flash] = "Jounal Officially Trashed!"
-    redirect "/articles/new"
-end
-#Users Logged Out
-get '/logout' do
-session['user_id'] = nil
-flash[:flash] = "Sucessfully Logged out C' Ya!"
-redirect '/'
-end
 
 
 

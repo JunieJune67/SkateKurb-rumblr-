@@ -1,0 +1,22 @@
+
+
+<nav>
+  <ul>
+  <% if session[:user_id] == nil %>
+  <li><a href="/allskaters">The feed</a></li>
+  <li><a href="/users/signup">Sign Up</a></li>
+  <li><a href="/">Log In</a></li>
+  <% else %>
+  <li><a href="/logout">Log Out</a></li>
+  <li><a href="/users/skaters/<%=session[:user_id]%>">Profile</a></li>
+  <li><a href="/allskaters">Newsfeed</a></li>
+  <li><a href="/">Skate Kurb</a></li>
+  </ul>
+</nav>
+
+  <% end %>
+  
+
+
+
+

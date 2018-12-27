@@ -7,6 +7,31 @@ font-family: 'Bangers', cursive; */
 
 
 
-html {
+/* html {
     background-color: aqua;
+    
 }
+ */
+
+.home-flex-container {
+    display: flex;
+    height: 90%;
+    width: 100%;
+    padding: 10px;
+    margin: 2px;
+    position: fixed;
+    background-size: auto;
+    
+  
+  }
+
+  .home-flex-design {
+    background-image: url(images/sk.jpg);
+    display: flex;
+    height: 620px;
+    width: 683px;
+  }
+
+  
+
+  
