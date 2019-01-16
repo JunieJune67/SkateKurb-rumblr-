@@ -1,6 +1,38 @@
 <%= erb :header %>
 
-<% @journal.reverse.each do |journal| %>
+<div class="main-container">
+
+  <div class="container center">
+    <% @user.journals.reverse.each do |jour| %>
+    <div class="article-grid center">
+      <div class="article">
+        <h4> <%= jour.title%></h4>
+        <p> <%= jour.text%></p>
+        <p>
+          <form action="<%=jour.id%>" method="post">
+            <input class="primary-btn" type="submit" name="delete" value="Thrash Journal" onclick="alert('Article Deleted!')">
+          </form>
+        </p>
+        
+
+      </div>
+
+    </div>
+    <% end %>
+  </div>
 
 
-<% end %>
+
+  <%user_journal = Journal.where(user_id: session[:user_id])%>
+
+  <% if user_journal.empty? %>
+  <div class="container center">
+  <div class="article-subgrid">
+    <h1>There are no posts</h1>
+    <a class="primary-btn" href="/users/skaters/<%=session[:user_id]%>">Create Post</a>
+  </div>
+  </div>
+  <% end %>
+
+
+</div>

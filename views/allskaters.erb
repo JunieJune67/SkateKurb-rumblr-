@@ -1,11 +1,32 @@
 <%= erb :header%>
    <h2> Latest Updates </h2>
     
- <% @journal.reverse.each do |journal| %>
-      <%# <% if post != nil %> 
-       <h3 id="jtitle" >    <%= journal.title %>    </h3>
-        <h4 id="jsub">    <%= journal.subcategory %> </h4>
-        <p id="jtext">    <%= journal.text %>     </p>
+ 
 
-        <%# <% end %> 
-        <% end %>
+<div class="main-container ">
+
+  <%if @all_journals.count == 0  %>
+  <div class="article-subgrid">
+    <h1>There are no journals at this time</h1>
+    <a class="primary-btn" href="/users/skaters/<%=session[:user_id]%>">Create Your First Post</a>
+  </div>
+
+  <% else %>
+
+    <div class="container center">
+    <%@all_journals.reverse.each do |jour|%>
+    <div class="article-grid">
+     
+    
+      <div class="article">
+      <h3><%= jour.title%></h3>
+      <% user = User.find(jour.user_id)%>
+      <h4>Created By: <%=user.username%></h4>
+      <p><%=jour.text%></p>
+    </div>
+    </div>
+    <%end%>
+  </div>
+
+  <% end %>
+</div>

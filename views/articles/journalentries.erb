@@ -1,0 +1,15 @@
+
+
+    <% @journals.each do |jour| %>
+        
+        <h3 id="jtitle" >    <%= jour.title %>    </h3>
+        <h4 id="jsub">    <%= jour.subcategory %> </h4>
+        <p id="jtext">    <%= jour.text %>     </p>
+        <h4 class="namesign"> <cite> <%= @user.username %></cite></h4>
+         <cite> <%=  jour.created_at  %> </cite>
+         <form action="/trashjournal/<%= journal.id%>" method="post">
+         <input id="#" type="submit" name="delete" value="Delete Journal">
+          </form> 
+
+
+        <% end %>
